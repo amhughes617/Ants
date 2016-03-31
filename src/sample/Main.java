@@ -30,7 +30,7 @@ public class Main extends Application {
         ArrayList<Ant> ants = new ArrayList<>();
         for (int i = 0; i < ANT_COUNT; i++) {
             Random r = new Random();
-            ants.add(new Ant(r.nextInt(WIDTH), r.nextInt(HEIGHT)));
+            ants.add(new Ant(r.nextInt(WIDTH), r.nextInt(HEIGHT), Color.BLACK));
         }
         return ants;
     }
@@ -38,7 +38,7 @@ public class Main extends Application {
     void drawAnts(GraphicsContext context) {
         context.clearRect(0, 0, WIDTH, HEIGHT);
         for (Ant ant : ants) {
-            context.setFill(Color.BLACK);
+            context.setFill(ant.color);
             context.fillOval(ant.x, ant.y, 5, 5);
         }
     }
@@ -57,9 +57,20 @@ public class Main extends Application {
         ant.y += randomStep();
         return ant;
     }
+    Ant aggravateAnt(Ant ant) {
+        ArrayList<Ant> list =
+                ants.stream()
+                .filter(nearAnt -> {
+                    return ((Math.abs(ant.x - nearAnt.x) < 10) && (Math.abs(ant.y - nearAnt.y) < 10));
+                })
+                .collect(Collectors.toCollection(ArrayList<Ant>::new));
+        ant.color = (list.size() != 1) ? Color.GREEN : Color.BLACK;
+        return ant;
+    }
     void updateAnts() {
         ants = ants.parallelStream()
                 .map(this::moveAnt)
+                .map(this::aggravateAnt)
                 .collect(Collectors.toCollection(ArrayList<Ant>::new));
     }
 
