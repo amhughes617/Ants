@@ -58,11 +58,14 @@ public class Main extends Application {
         return ant;
     }
     Ant aggravateAnt(Ant ant) {
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         ArrayList<Ant> list =
-                ants.stream()
-                .filter(nearAnt -> {
-                    return ((Math.abs(ant.x - nearAnt.x) < 10) && (Math.abs(ant.y - nearAnt.y) < 10));
-                })
+                ants.parallelStream()
+                .filter(nearAnt -> (Math.abs(ant.x - nearAnt.x) < 10) && (Math.abs(ant.y - nearAnt.y) < 10))
                 .collect(Collectors.toCollection(ArrayList<Ant>::new));
         ant.color = (list.size() != 1) ? Color.GREEN : Color.BLACK;
         return ant;
